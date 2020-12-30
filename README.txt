@@ -1,11 +1,12 @@
 This program is a Personal project to make and  work on the RESTful API by Node.js
 
 
-#implementing nessessary packages:
+#1 implementing nessessary packages:
+#Please run below comment in the project directory 
 
-npm install express nodemon morgan body-parser
+npm run initialization
 
 
-#run the program:
+#2 run the program:
 
 npm run start  
