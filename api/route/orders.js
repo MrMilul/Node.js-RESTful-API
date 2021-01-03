@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose')
 const Order = require('../models/order')
+const Product = require('../models/product')
 
 router.get('/', (req, res, next)=>{
-    Order.find().exec().then((result)=>{
+    Order.find().populate('product', 'name').exec().then((result)=>{
         const ress = {
             count: result.length,
             orders: result.map(ords=>{
@@ -23,7 +24,8 @@ router.get('/', (req, res, next)=>{
     })
     .catch((err)=>{
         res.status(500).json({
-            error: err
+            error: err, 
+            message: "We catching the errors"
         })
     })
 })
@@ -52,17 +54,25 @@ router.post('/', (req, res, next)=>{
 
 router.get('/:orderId', (req, res, next)=>{
     const id = req.params.orderId
-   Order.findById(id).exec().then((result)=>{
+
+   Order.findById(id).populate('product').exec().then((result)=>{
        if(!result){
            return res.status(404).json({
                message: "Requested query Not Found"
            })
        }
-       res.status(200).json(result)
+       const ress = {
+           id: result._id,
+           quantity: result.quantity,
+           product: result.product
+       }
+       res.status(200).json(ress)
    })
    .catch((err)=>{
        res.status(500).json({
-           error:err
+           error:err, 
+           message: "We catching the errors"
+
        })
    })
 })
