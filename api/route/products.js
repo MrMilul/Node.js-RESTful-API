@@ -6,16 +6,25 @@ const Product = require('../models/product')
 
 
 router.get('/', (req, res, next)=>{
-   Product.find().exec().then(docs =>{
-       if(docs.length > 0){
-        res.status(200).json(docs)
-       }else{
-           res.status(500).json({
-               message: "No data in DB"
-           })
-       }
+   Product.find().select('name price _id').exec()
+   .then(docs =>{
+       const response = {
+            count: docs.length,
+            products: docs.map(doc =>{
+                return{
+                    name: doc.name,
+                    price: doc.price,
+                    id: doc._id,
+                    request:{
+                        type: "GET",
+                        url: `http://localhost:3000/products/${doc._id}`
+                    }
+                }
 
-   })
+            })        
+       }
+      res.status(200).json(response)
+    })
    .catch(err=>{
        res.status(500).json({
            error:err
@@ -25,7 +34,7 @@ router.get('/', (req, res, next)=>{
 
 router.post('/', (req, res, next)=>{
     const product = new Product({
-        _id : mongoose.Types.ObjectId(),
+        _id : new mongoose.Types.ObjectId(),
         name:req.body.name,
         price:req.body.price
     })
@@ -62,8 +71,18 @@ router.get('/:productId', (req, res, next)=>{
 
 router.patch('/:productId', (req, res, next)=>{
     const id = req.params.productId
-    res.status(200).json({
-        message:`You Updated a product by this => ${id} id `, 
+    const updateOps = {}
+    for (const ops of req.body){
+        updateOps[ops.propName] = ops.value
+    }
+    Product.update({_id:id}, {$set: updateOps}).exec()
+    .then(result=>{
+        res.status(200).json(result)    
+    })
+    .catch((err)=>{
+        res.status(500).json({
+            error: err
+        })
     })
 })
 
