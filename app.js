@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 
 const productRoutes = require('./api/route/products')
 const orderRoutes = require ('./api/route/orders')
-
+const userRoutes = require('./api/route/users')
 
 //using morgan as a logger 
 app.use(morgan('dev'))
@@ -40,6 +40,7 @@ app.use((req, res, next)=>{
 //importing APIs
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/user', userRoutes)
 
 
 //handling the 404 errors  
